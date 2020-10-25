@@ -1,8 +1,12 @@
-var receiveMessage = document.querySelector('.button');
+var receiveMessageBtn = document.querySelector('.receive-message');
 var meditateImage = document.querySelector('.meditate-image');
 var message = document.querySelector('.message');
 var affirmRadio = document.querySelector('#affirmation');
 var mantraRadio = document.querySelector('#mantra');
+var favoriteBtn = document.querySelector('.favorite');
+var viewFavorites = document.querySelector('.view-favorites');
+var favoriteMsgs = document.querySelector('.favorite-messages');
+
 var affirmations = [
 'I forgive myself and set myself free.',
 'I believe I can be all that I want to be.',
@@ -36,6 +40,8 @@ var mantras = [
 'I am the sky, the rest is weather.'
 ]
 
+var savedMessages = [];
+
 affirmRadio.addEventListener('click', function() {
   affirmRadio.checked = true;
 })
@@ -44,25 +50,54 @@ mantraRadio.addEventListener('click', function() {
   mantraRadio.checked = true;
 })
 
-
-receiveMessage.addEventListener('click', printMessage);
+receiveMessageBtn.addEventListener('click', printMessage);
+favoriteBtn.addEventListener('click', favoriteMessage);
+viewFavorites.addEventListener('click', favoriteMsgsPage);
 
 function getRandomIndex(array) {
   return Math.floor(Math.random() * array.length);
 }
 
+var mantra = mantras[getRandomIndex(mantras)];
+var affirmation = affirmations[getRandomIndex(affirmations)];
+
+function showButton() {
+  favoriteBtn.classList.remove('hidden');
+};
+
 function hideImage() {
   meditateImage.classList.add('hidden');
+};
+
+function toggle(form) {
+  favoriteMsgs.classList.toggle('hidden');
 }
 
 function printMessage() {
   event.preventDefault();
-  hideImage();
   if (affirmRadio.checked === true) {
-    var affirmation = affirmations[getRandomIndex(affirmations)];
+    hideImage();
     message.innerText = affirmation;
+    showButton();
   } else if (mantraRadio.checked === true) {
-    var mantra = mantras[getRandomIndex(mantras)];
+    hideImage();
     message.innerText = mantra;
+    showButton();
+  } else {
   }
 };
+
+
+function favoriteMessage() {
+  if(message.innerText === affirmation
+    && !savedMessages.includes(affirmation)) {
+    savedMessages.push(affirmation);
+  } else if (message.innerText === mantra
+    && !savedMessages.includes(mantra)) {
+    savedMessages.push(mantra);
+  }
+};
+
+function favoriteMsgsPage() {
+  toggle();
+}
