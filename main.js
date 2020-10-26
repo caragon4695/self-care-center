@@ -1,3 +1,9 @@
+class Message {
+  constructor(message) {
+    this.message = message;
+  }
+};
+
 var receiveMessageBtn = document.querySelector('.receive-message');
 var meditateImage = document.querySelector('.meditate-image');
 var message = document.querySelector('.message');
@@ -6,6 +12,10 @@ var mantraRadio = document.querySelector('#mantra');
 var favoriteBtn = document.querySelector('.favorite');
 var viewFavorites = document.querySelector('.view-favorites');
 var favoriteMsgs = document.querySelector('.favorite-messages');
+var mainPage = document.querySelector('.main-page');
+var goBack = document.querySelector('button.favorites');
+var favoritesList = document.querySelector('.favorites-list');
+var deleteFav = document.querySelector('.delete');
 
 var affirmations = [
 'I forgive myself and set myself free.',
@@ -41,6 +51,7 @@ var mantras = [
 ]
 
 var savedMessages = [];
+var currentMessage;
 
 affirmRadio.addEventListener('click', function() {
   affirmRadio.checked = true;
@@ -52,14 +63,13 @@ mantraRadio.addEventListener('click', function() {
 
 receiveMessageBtn.addEventListener('click', printMessage);
 favoriteBtn.addEventListener('click', favoriteMessage);
-viewFavorites.addEventListener('click', favoriteMsgsPage);
+viewFavorites.addEventListener('click', showFavoriteMessages);
+goBack.addEventListener('click', favoriteMsgsPage);
+deleteFav.addEventListener('click', deleteFavMsg);
 
 function getRandomIndex(array) {
   return Math.floor(Math.random() * array.length);
-}
-
-var mantra = mantras[getRandomIndex(mantras)];
-var affirmation = affirmations[getRandomIndex(affirmations)];
+};
 
 function showButton() {
   favoriteBtn.classList.remove('hidden');
@@ -69,35 +79,52 @@ function hideImage() {
   meditateImage.classList.add('hidden');
 };
 
-function toggle(form) {
-  favoriteMsgs.classList.toggle('hidden');
-}
-
-function printMessage() {
-  event.preventDefault();
-  if (affirmRadio.checked === true) {
-    hideImage();
-    message.innerText = affirmation;
-    showButton();
-  } else if (mantraRadio.checked === true) {
-    hideImage();
-    message.innerText = mantra;
-    showButton();
-  } else {
-  }
+function toggle(page) {
+  page.classList.toggle('hidden');
 };
 
 
+function printMessage() {
+  event.preventDefault();
+  if (affirmRadio.checked) {
+    hideImage();
+    currentMessage = new Message(affirmations[getRandomIndex(affirmations)])
+    message.innerText = currentMessage.message;
+    showButton();
+  }else if (mantraRadio.checked) {
+    hideImage();
+    currentMessage = new Message(mantras[getRandomIndex(mantras)])
+    message.innerText = currentMessage.message;
+    showButton();
+  }
+};
+
 function favoriteMessage() {
-  if(message.innerText === affirmation
-    && !savedMessages.includes(affirmation)) {
-    savedMessages.push(affirmation);
-  } else if (message.innerText === mantra
-    && !savedMessages.includes(mantra)) {
-    savedMessages.push(mantra);
+  if(!savedMessages.includes(currentMessage.message)) {
+    savedMessages.push(currentMessage);
   }
 };
 
 function favoriteMsgsPage() {
-  toggle();
-}
+  toggle(favoriteMsgs);
+  toggle(mainPage);
+};
+
+function showFavoriteMessages() {
+  favoriteMsgsPage();
+  favoritesList.innerHTML = '';
+  for (var i = 0; i < savedMessages.length; i++) {
+    favoritesList.innerHTML += `
+    <li class="favorite-message">${savedMessages[i].message}
+    <button class="delete">Delete</button></li>`
+  }
+};
+
+function deleteFavMsg(event) {
+  var favMsg = event.target.parentNode;
+  for(var i = 0; i < savedMessages.length; i++) {
+    if (favMsg === savedMessages[i].message) {
+      savedMessages.splice(i, 1);
+    }
+  }
+};
