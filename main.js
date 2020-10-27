@@ -14,8 +14,12 @@ var viewFavorites = document.querySelector('.view-favorites');
 var favoriteMsgs = document.querySelector('.favorite-messages');
 var mainPage = document.querySelector('.main-page');
 var goBack = document.querySelector('button.favorites');
-var favoritesList = document.querySelector('.favorites-list');
-var deleteFav = document.querySelector('.delete');
+var favoritesList = document.querySelector('.favorite-messages-list');
+var clearBtn = document.querySelector('.clear');
+document
+  .querySelector(".favorites-list")
+  .addEventListener(
+    "click", deleteFavMessage);
 
 var affirmations = [
 'I forgive myself and set myself free.',
@@ -49,69 +53,79 @@ var mantras = [
 'Onward and upward.',
 'I am the sky, the rest is weather.'
 ]
-
 var savedMessages = [];
 var currentMessage;
 
+receiveMessageBtn.addEventListener('click', receiveMessage);
+favoriteBtn.addEventListener('click', favoriteMessage);
+viewFavorites.addEventListener('click', showFavoriteMessages);
+goBack.addEventListener('click', favoriteMessagesPage);
+clearBtn.addEventListener('click', clearMessage);
+
 affirmRadio.addEventListener('click', function() {
   affirmRadio.checked = true;
-})
+  if (affirmRadio.checked) {
+    receiveMessageBtn.removeAttribute('disabled');
+  }
+});
 
 mantraRadio.addEventListener('click', function() {
   mantraRadio.checked = true;
-})
+  if (mantraRadio.checked) {
+    receiveMessageBtn.removeAttribute('disabled');
+  }
+});
 
-receiveMessageBtn.addEventListener('click', printMessage);
-favoriteBtn.addEventListener('click', favoriteMessage);
-viewFavorites.addEventListener('click', showFavoriteMessages);
-goBack.addEventListener('click', favoriteMsgsPage);
-deleteFav.addEventListener('click', deleteFavMsg);
-
-function getRandomIndex(array) {
-  return Math.floor(Math.random() * array.length);
+function removeHidden(button) {
+  button.classList.remove('hidden');
 };
 
-function showButton() {
-  favoriteBtn.classList.remove('hidden');
-};
-
-function hideImage() {
-  meditateImage.classList.add('hidden');
+function addHidden(image) {
+  image.classList.add('hidden');
 };
 
 function toggle(page) {
   page.classList.toggle('hidden');
 };
 
+function getRandomIndex(array) {
+  return Math.floor(Math.random() * array.length);
+};
 
 function printMessage() {
-  event.preventDefault();
   if (affirmRadio.checked) {
-    hideImage();
+    addHidden(meditateImage);
     currentMessage = new Message(affirmations[getRandomIndex(affirmations)])
     message.innerText = currentMessage.message;
-    showButton();
+    removeHidden(favoriteBtn);
   }else if (mantraRadio.checked) {
-    hideImage();
+    addHidden(meditateImage);
     currentMessage = new Message(mantras[getRandomIndex(mantras)])
     message.innerText = currentMessage.message;
-    showButton();
+    removeHidden(favoriteBtn);
   }
 };
 
+function receiveMessage() {
+  removeHidden(clearBtn);
+  removeHidden(message);
+  event.preventDefault();
+  printMessage();
+};
+
 function favoriteMessage() {
-  if(!savedMessages.includes(currentMessage.message)) {
+  if(!savedMessages.includes(currentMessage)) {
     savedMessages.push(currentMessage);
   }
 };
 
-function favoriteMsgsPage() {
+function favoriteMessagesPage() {
   toggle(favoriteMsgs);
   toggle(mainPage);
 };
 
 function showFavoriteMessages() {
-  favoriteMsgsPage();
+  favoriteMessagesPage();
   favoritesList.innerHTML = '';
   for (var i = 0; i < savedMessages.length; i++) {
     favoritesList.innerHTML += `
@@ -120,11 +134,21 @@ function showFavoriteMessages() {
   }
 };
 
-function deleteFavMsg(event) {
-  var favMsg = event.target.parentNode;
+function deleteFavMessage(event) {
+  var favMsg = favoritesList.innerText
+  favMsg = event.target.innerText;
   for(var i = 0; i < savedMessages.length; i++) {
     if (favMsg === savedMessages[i].message) {
       savedMessages.splice(i, 1);
     }
   }
+};
+
+function clearMessage() {
+    addHidden(message);
+    removeHidden(meditateImage);
+    addHidden(favoriteBtn);
+    addHidden(clearBtn);
+    affirmRadio.checked = false;
+    mantraRadio.checked = false;
 };
